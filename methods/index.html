@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<link href='/style.css' rel='stylesheet'>
+<link href='http://fonts.googleapis.com/css?family=Scada' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Oranienbaum' rel='stylesheet' type='text/css'>
+<script type='text/javascript' src='/assets/js/jstat.js'></script>
+<script type='text/javascript' src='/assets/js/linear_algebra.js'></script>
+<script type='text/javascript' src='/assets/js/covariance.js'></script>
+<script type='text/javascript' src='/assets/js/animation.js'></script>
+<script type='text/javascript' src='/assets/js/jquery.js'></script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type='text/javascript'></script>
+<!--Load the AJAX API-->
+<script src='https://www.google.com/jsapi' type='text/javascript'></script>
+<meta content='nanoc 4.8.10' name='generator'>
+<title>
+Comparing methods for animation
+[Gaussian Oscillators]
+</title>
+</head>
+<body>
+<div id='title'>
+<a title="Main page" href="/">Gaussian Oscillators</a>
+<div id='nav'>
+<ul>
+<li>
+<span class="active">Methods</span>
+</li>
+</ul>
+</div>
+</div>
+<hr>
+<div id='main'>
+<p>How can we visualize a probability distribution of functions?</p>
+<p>One way is <em>animations</em>. Each frame shows a single function: a single sample from the distribution. Consecutive frames are <em>correlated</em>, so that the function appears to move. The vertical motion indicates the magnitude of the uncertainty at a point. The horizontal structure shows how different points are related to each other for functions in the distribution.</p>
+<p>Not all animation techniques are equally effective. This page compares different techniques: beginning with the pre-existing approaches, and working towards a new method which combines the best features of all.</p>
+<p>(Every figure visualizes the same distribution: a Squared Exponential covariance, with hyperparameters <span class="math inline">\(\left(\ell = 1, \sigma = 1\right)\)</span>.)</p>
+<h2 id="interpolation">Interpolation</h2>
+<p>This method starts with a sequence of <em>independent</em> samples from the distribution. We then interpolate between neighboring samples, keeping the marginal distribution the same at all times.</p>
+<p>(In other words: <em>any</em> individual frame -- even an interpolated one -- shows a sample from the distribution.)</p>
+<div id="chart_interp">
+
+</div>
+<p>The main disadvantage is that the <em>keyframes</em> -- i.e., the frames with the original, independent samples -- are treated specially. Each keyframe exhibits a distracting &quot;jerk&quot; in the motion, as the function pivots to move towards the next keyframe.</p>
+<h2 id="great-circles">Great Circles</h2>
+<p><em>Great circles</em> are an alternative method which corrects the deficiencies of interpolation. Their motion is perfectly smooth. Moreover, every frame is exactly equivalent to every other frame.</p>
+<p>This method works by producing a great circle in <span class="math inline">\(N\)</span>-dimensional space (where <span class="math inline">\(N\)</span> is the number of points in the curve). Both the radius of the circle and its orientation are random.</p>
+<div id="chart_great_circle">
+
+</div>
+<p>This method exhibits more fluid and appealing motion, but it has a number of disadvantages.</p>
+<p>First, it repeats itself, so that any given animation only visualizes a small fraction of the distribution. (By contrast, the interpolation method can continuously generate new curves, and explore more and more of the distribution over time.)</p>
+<p>Second, circular paths are strongly <em>time-anticorrelated</em>. This means that whatever curve we see, we will soon see its &quot;opposite&quot;. (In the case of zero-mean priors, as on this page, this means we will see the exact negative -- watch it and see!)</p>
+<h2 id="delocalized-oscillators">Delocalized oscillators</h2>
+<p>This more flexible method contains the Great Circles method above as a special case. The motion is still perfectly smooth. However, it can be extended for longer time periods and take more complicated paths, visualizing much more of the distribution.</p>
+<div id="chart_loop">
+
+</div>
+<p>The downside is that it still eventually repeats. Moreover, the resource requirements are <em>quadratic</em> in the length of the animation (<span class="math display">\[O(t^2)\]</span>)! This creates an unfortunate tension: we want longer animations (because they show more of the distribution), but the resource requirements quickly become unmanageable.</p>
+<h2 id="compact-support-covariance-oscillators">Compact support covariance oscillators</h2>
+<p>The method of <em>compact support covariance</em> combines the advantages of the above techniques, without the drawbacks. In this method, each frame is correlated only with other frames within a certain time window, <span class="math inline">\(\Delta t\)</span>. This correlation function is smooth everywhere; therefore, so is the motion. Furthermore, although no frames are treated specially in any way (as with great circles and delocalized oscillators), we can continue to generate new frames with constant resource requirements (<span class="math display">\[O(1)\]</span> with respect to <span class="math display">\[t\]</span>, as with interpolation).</p>
+<div id="chart_CS">
+
+</div>
+<p>The resulting function does not journey from one discrete keyframe to the next, nor does it ever repeat its position. Rather, it simply evolves. It takes a smooth, beautiful path through <span class="math inline">\(N\)</span>-dimensional space, exploring more and more of the distribution as time goes on. The viewer of this function can understand the distribution it represents simply by watching it move.</p>
+<h2 id="other-distributions">Other distributions</h2>
+<p>Of course, we could have visualized other distributions too.</p>
+<p>For example, consider the <a href="https://en.wikipedia.org/wiki/Mat%C3%A9rn_covariance_function">family of Matérn covariance functions</a>. They are categorized by an additional hyperparameter <span class="math inline">\(\nu\)</span>, which <a href="http://ml.dcs.shef.ac.uk/gpip/slides/rasmussen.pdf">governs the degree of smoothness</a>. The <span class="math inline">\(\nu = \frac{1}{2}\)</span> case is equivalent to the Exponential covariance, while <span class="math inline">\(\nu \rightarrow \infty\)</span> is equivalent to the Squared Exponential covariance we've been visualizing above.</p>
+<p>On this page, you can change the covariance on the fly to see how different members of the Matérn family behave. Pressing <code>1</code> will show the <span class="math inline">\(\nu = \frac{1}{2}\)</span> case (i.e., the exponential). <code>2</code> will show <span class="math inline">\(\nu = \frac{3}{2}\)</span>, <code>3</code> will show <span class="math inline">\(\nu = \frac{5}{2}\)</span>, and <code>4</code> will return to the Squared Exponential (<span class="math inline">\(\nu \rightarrow \infty\)</span>) we've already been visualizing.</p>
+<p>I particularly recommend going up and down the &quot;ladder&quot; -- going from 1 up to 3, and back -- to get a feel for the effect of <span class="math inline">\(\nu\)</span>. The functions are fairly similar, but more (1) or less (3) jaggy.</p>
+<p>Happy viewing!</p>
+<script type='text/javascript'>
+// Load the Visualization API.
+google.load('visualization', '1.0', {'packages':['corechart']});
+// Set a callback to run when the Google Visualization API is loaded.
+var myChart = null;
+google.setOnLoadCallback(loaded);
+
+// Global variables I might find useful.
+var x = Sequence(0, 8, 51);
+
+function loaded() {
+  var k_SE = SquaredExponential(1, 1);
+
+  interpChart = AnimatedChart(
+      InterpolatingGenerator(x, jStat(x).multiply(0), k_SE, 10),
+      'chart_interp',
+      'Interpolation: Skilling (1992); Ehlschlaeger, Shortridge, Goodchild (1997)');
+  interpChart.start();
+
+  greatCircleChart = AnimatedChart(
+      GreatCircleGenerator(x, jStat(x).multiply(0), k_SE, 20),
+      'chart_great_circle',
+      'Great circles: Hennig (2013)');
+  greatCircleChart.start();
+
+  loopingChart = AnimatedChart(
+      DelocalizedGenerator(x, jStat(x).multiply(0), k_SE, 20, 8),
+      'chart_loop',
+      'Delocalized oscillators: Hogg (2013)');
+  loopingChart.start();
+
+  csChart = AnimatedChart(
+      CompactSupportCovarianceGenerator(x, jStat(x).multiply(0), k_SE, 20),
+      'chart_CS',
+      'Compact support covariance: Hogg (2019)');
+  csChart.start();
+};
+</script>
+<script type='text/javascript'>
+handleKeyPress = function(e) {
+  e = e || window.event;
+  var k;
+  switch (String.fromCharCode(e.keyCode)) {
+    case '1':
+      k = Exponential(1, 1);
+      break;
+    case '2':
+      k = Matern3v2(1, 1);
+      break;
+    case '3':
+      k = Matern5v2(1, 1);
+      break;
+    case '4':
+      k = SquaredExponential(1, 1);
+      break;
+    default:
+      return;
+  }
+  interpChart.UpdateCovariance(k);
+  greatCircleChart.UpdateCovariance(k);
+  loopingChart.UpdateCovariance(k);
+  csChart.UpdateCovariance(k);
+}
+
+document.addEventListener("keypress", handleKeyPress, false);
+</script>
+
+</div>
+</body>
+</html>
