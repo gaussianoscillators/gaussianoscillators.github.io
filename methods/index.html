@@ -57,9 +57,9 @@ Comparing methods for animation
 <div id="chart_loop">
 
 </div>
-<p>The downside is that it still eventually repeats. Moreover, the resource requirements are <em>quadratic</em> in the length of the animation (<span class="math display">\[O(t^2)\]</span>)! This creates an unfortunate tension: we want longer animations (because they show more of the distribution), but the resource requirements quickly become unmanageable.</p>
+<p>The downside is that it still eventually repeats. Moreover, the resource requirements are <em>quadratic</em> in the length of the animation (<span class="math inline">\(O(t^2)\)</span>)! This creates an unfortunate tension: we want longer animations (because they show more of the distribution), but the resource requirements quickly become unmanageable.</p>
 <h2 id="compact-support-covariance-oscillators">Compact support covariance oscillators</h2>
-<p>The method of <em>compact support covariance</em> combines the advantages of the above techniques, without the drawbacks. In this method, each frame is correlated only with other frames within a certain time window, <span class="math inline">\(\Delta t\)</span>. This correlation function is smooth everywhere; therefore, so is the motion. Furthermore, although no frames are treated specially in any way (as with great circles and delocalized oscillators), we can continue to generate new frames with constant resource requirements (<span class="math display">\[O(1)\]</span> with respect to <span class="math display">\[t\]</span>, as with interpolation).</p>
+<p>The method of <em>compact support covariance</em> combines the advantages of the above techniques, without the drawbacks. In this method, each frame is correlated only with other frames within a certain time window, <span class="math inline">\(\Delta t\)</span>. This correlation function is smooth everywhere; therefore, so is the motion. Furthermore, although no frames are treated specially in any way (as with great circles and delocalized oscillators), we can continue to generate new frames with constant resource requirements (<span class="math inline">\(O(1)\)</span> with respect to <span class="math inline">\(t\)</span>, as with interpolation).</p>
 <div id="chart_CS">
 
 </div>
